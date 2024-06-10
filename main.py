@@ -28,41 +28,6 @@ headers = {
     "Content-Type": "application/json; charset=utf-8",
 }
 
-ensa_pass = os.getenv('STC_API_PASSENSA') + datetime.now().strftime('%Y%m%d')
-ensa_infos = {
-    "code_ensa": os.getenv('STC_API_CODEENSA', 'lyon'),
-    "pass_ensa": hashlib.sha1(ensa_pass.encode()).hexdigest(),
-}
-
-collections = [
-    {
-        "function": export_ind,
-        "method": "ExportInd",
-        "params": {
-            **ensa_infos,
-            "type": "etd",
-            "id": "*",
-        },
-    },
-    {
-        "function": export_ind,
-        "method": "ExportInd",
-        "params": {
-            **ensa_infos,
-            "type": "adm",
-            "id": "*",
-        },
-    },
-    {
-        "function": export_ind,
-        "method": "ExportInd",
-        "params": {
-            **ensa_infos,
-            "type": "esn",
-            "id": "*",
-        },
-    },
-]
 
 
 async def main():
