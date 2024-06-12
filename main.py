@@ -6,8 +6,7 @@ from dotenv import load_dotenv
 import hashlib
 from datetime import datetime
 
-from src.a_moins_b import a_moins_b
-from src.export_ind import export_ind
+
 from src.import_ind import import_ind
 
 logging.basicConfig(level=logging.INFO)

@@ -27,15 +27,17 @@ async def read_response(response):
     jsonMessage = json.loads(message)
     print(jsonMessage)
 
-async def send_request(session, url, json):
+async def send_request(session, url, json, primaryKey):
     headers = {
         "Authorization": f"Bearer {sesame_api_token}",
         "Content-Type": "application/json; charset=utf-8",
     }
-    params = {
-        "filters[inetOrgPerson.employeeNumber]": f"{json.get('inetOrgPerson', {}).get('employeeNumber')}",
-        "filters[inetOrgPerson.employeeType]": "TAIGA",
-    }
+
+    params = {}
+    for k in primaryKey:
+        mykey="filters[" + k + "]"
+        params[mykey]=get_value(json,k)
+
 
     try:
 
@@ -69,7 +71,7 @@ async def process_data(data, config, file, session):
     result = await get_data(data, config)
     with open(f'./data/{file}', 'w', encoding='utf-8') as fichier:
         json.dump(result, fichier, ensure_ascii=False, indent=4)
-    tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert', entry) for entry in result]
+    tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert', entry,config.get('primaryKey',["inetOrgPerson.employeeType","inetOrgPerson.employeeNumber"])) for entry in result]
     await gather_with_concurrency(sesame_import_parallels_files, tasks)
     print(f"Processed {file}")
 
@@ -90,3 +92,11 @@ async def import_ind():
     async with aiohttp.ClientSession() as session:
         tasks = [process_data(datas[file], configs[file], file, session) for file in cache_files if file in configs.keys()]
         await gather_with_concurrency(sesame_import_parallels_files, tasks)
+
+
+def get_value(data, path):
+    keys = path.split('.')
+    value = data
+    for key in keys:
+        value = value[key]
+    return value

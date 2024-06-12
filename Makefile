@@ -28,7 +28,7 @@ run-crawler-docker: ## Lance le crawler Sesame - Taiga avec python !
 		--platform $(PLATFORM) \
 		--name $(APP_NAME) \
 		-v $(CURDIR):/data \
-		sesame-taiga_crawler
+		ghcr.io/libertech-fr/sesame-crawler:latest
 
 run-crawler: ## Lance le crawler Sesame - Taiga avec python !
 	@python3 main.py
@@ -37,14 +37,6 @@ install-deps: ## Installe les dépendances python
 	@printf "\033[33mPIP:\033[0m install required dependencies ...\n"
 	@pip install -r requirements.txt
 	@printf "\033[33mPIP:\033[0m SUCCESSFUL !!!\n"
-
-taiga-forward: ## Transfert les appels de l'API Taiga via un proxy socks au travers du serveur sesame (à utiliser pour lancer le script à distance)
-	@printf "\033[33mNCAT:\033[0m Launch forwarding tcp requests for <$(STC_API_HOST)> ...\n"
-	@ssh libertech@$(STC_API_TARGET) "pkill -f 'ncat $(STC_API_HOST) 443'" || true
-	@ssh libertech@$(STC_API_TARGET) "ncat --keep-open --no-shutdown -v \
-		--sh-exec 'ncat $(STC_API_HOST) 443' \
-		-l $(STC_API_FORWARD_PORT)"
-	@printf "\033[33mNCAT:\033[0m End of forwarding requests !\n"
 
 update-reqs: ## Met à jour la liste des dépendances python
 	@printf "\033[33mUPDATE:\033[0m pipreqs dependency ...\n"
