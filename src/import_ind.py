@@ -10,7 +10,7 @@ dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
 sesame_api_token = os.getenv('SESAME_API_TOKEN')
 sesame_import_parallels_files = int(os.getenv('SESAME_IMPORT_PARALLELS_FILES', 1))
-sesame_import_parallels_entries = int(os.getenv('SESAME_IMPORT_PARALLELS_ENTRIES', 5))
+sesame_import_parallels_entries = int(os.getenv('SESAME_IMPORT_PARALLELS_ENTRIES', 1))
 
 async def gather_with_concurrency(n, tasks):
     semaphore = asyncio.Semaphore(n)
@@ -40,7 +40,8 @@ async def send_request(session, url, json, primaryKey):
 
 
     try:
-
+        if params is not None:
+            params = {k: v for k, v in params.items() if v is not None}
         async with session.post(url, json=json, headers=headers, params=params) as response:
             print(f"Request to {url} successful: {response.status}")
             if response.status == 304:
